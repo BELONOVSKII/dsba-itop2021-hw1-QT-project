@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QStringList>
 #include <QtGui>
+#include <set>
 
 typedef std::map<std::string,airbnbProperty> mapOfProperty;
 class airbnbDataBase
@@ -23,8 +24,10 @@ public:
      airbnbProperty getSingleValue(std::string& s);
      void addProperty(airbnbProperty& air);
      void save();
+     std::set<QString> setOfTowns;
+     mapOfProperty& getPropertyData();
 private:
-    mapOfProperty propertyData;
+     mapOfProperty propertyData;
 };
 
 #endif // AIRBNBDATABASE_H

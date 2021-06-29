@@ -3,6 +3,7 @@
 #include <iostream>
 #include "editwindow.h"
 #include "about.h"
+#include "airbnbProperty.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -14,6 +15,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableView->setModel(standartModel);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     style();
+    connect(ui->tableView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onTableClicked(const QModelIndex &)));
+
+    connect(ui->tableView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(onTableClicked1(const QModelIndex &)));
 
 }
 MainWindow::~MainWindow()
@@ -184,3 +188,60 @@ void MainWindow::style()
 
     ui->searchEdit->setStyleSheet("QLineEdit{background-color: green; color:white}");
 }
+void MainWindow::onTableClicked(const QModelIndex &index)
+{
+    try
+    {
+        std::string s = "open " + index.data().toString().toStdString();
+        const char * c = s.c_str();
+        system(c);
+    }
+    catch(...)
+    {};
+
+}
+void MainWindow::onTableClicked1(const QModelIndex &index)
+{
+    if (!check2)
+    {
+        QString qs = index.data().toString();
+        std::set<QString>::iterator it = data.setOfTowns.find(qs);
+        if (it != data.setOfTowns.end())
+        {
+            standartModel = new QStandardItemModel(data.setOfTowns.size(), 1, this);
+            int i = 0;
+            for(std::set<QString>::iterator it2 = data.setOfTowns.begin(); it2 != data.setOfTowns.end(); it2++)
+            {
+                   QModelIndex ind = standartModel->index(i,0,QModelIndex());
+                   standartModel->setData(ind,(*it2));
+                   i++;
+            }
+            title = ui->tableView->model()->index(index.row(),1,QModelIndex()).data().toString();
+            ui->tableView->setModel(standartModel);
+            check2 = !check2;
+        }
+    }
+    if (check2)
+    {
+        QItemSelectionModel *selectModel = ui->tableView->selectionModel();
+        QModelIndexList indexes = selectModel->selectedIndexes();
+        for (QModelIndex ind : indexes)
+        {
+            int row = ind.row();
+            QModelIndex index = ui->tableView->model()->index(row,0,QModelIndex());
+            std::string s = index.data().toString().toStdString();
+            airbnbProperty a;
+            a = data.getPropertyData()[title.toStdString()];
+            a.city = QString::fromStdString(s);
+            data.getPropertyData()[title.toStdString()] = a;
+            standartModel = new QStandardItemModel(data.countRows(),data.countColumns(),this);
+            data.fillingTheModel(standartModel);
+            ui->tableView->setModel(standartModel);
+            check2 = !check2;
+        }
+    }
+
+
+
+}
+

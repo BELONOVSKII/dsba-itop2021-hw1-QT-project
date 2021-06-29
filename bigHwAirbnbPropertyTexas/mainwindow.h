@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "airbnbdatabase.h"
 #include <QStringListModel>
+#include <set>
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -16,12 +17,18 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void addItem(airbnbProperty& air);
+    std::set<QString> getSet();
 
 signals:
     void sendData(airbnbProperty& air);
 
+
 public slots:
     void recieveData(airbnbProperty& air);
+
+    void onTableClicked(const QModelIndex &);
+
+    void onTableClicked1(const QModelIndex &);
 
 private slots:
     void on_deleteButton_clicked();
@@ -49,5 +56,9 @@ private:
     airbnbDataBase data;
     QStandardItemModel *standartModel;
     bool check = false;
+    bool check2 = false;
+    QModelIndex index1;
+    QString title;
+    QString city;
 };
 #endif // MAINWINDOW_H

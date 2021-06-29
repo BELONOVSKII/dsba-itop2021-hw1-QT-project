@@ -28,7 +28,11 @@ void airbnbDataBase::fill()
             property.title = temp.at(13);
             property.url = temp.at(15).toStdString();
             if (property.title.toStdString() != "")
-                propertyData[property.title.toStdString()] = property;
+            {
+                    propertyData[property.title.toStdString()] = property;
+                    setOfTowns.insert(property.city);
+            }
+
         }
         catch (...)
         {
@@ -83,9 +87,13 @@ void airbnbDataBase::deleteItem(std::string s)
 mapOfProperty airbnbDataBase::getValues(std::string &s)
 {
     mapOfProperty map1;
-    mapOfProperty::iterator it = propertyData.find(s);
-    if (it != propertyData.end())
-        map1[(*it).first] = (*it).second;
+    QString d = QString::fromStdString(s);
+    for (mapOfProperty::iterator it = propertyData.begin();it != propertyData.end();it++)
+    {
+          QString s  = (*it).second.title;
+          if (s.contains(d))
+              map1[(*it).first] = (*it).second;
+    }
     return map1;
 }
 airbnbDataBase::airbnbDataBase(mapOfProperty& map1):propertyData(map1){};
@@ -109,6 +117,11 @@ void airbnbDataBase::save()
                    "\"" << (*it).second.title.toStdString() << "\",\"" << (*it).second.url << "\"\n";
     }
     outFile.close();
+}
+
+mapOfProperty& airbnbDataBase::getPropertyData()
+{
+    return propertyData;
 }
 
 
